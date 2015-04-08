@@ -23,8 +23,6 @@ Adafruit_SI1145::Adafruit_SI1145() {
 
 
 boolean Adafruit_SI1145::begin(void) {
-  Wire.begin();
- 
   uint8_t id = read8(SI1145_REG_PARTID);
   if (id != 0x45) return false; // look for SI1145
   
