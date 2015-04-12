@@ -149,15 +149,24 @@
 class Adafruit_SI1145  {
  public:
   Adafruit_SI1145(void);
-  boolean begin();
-  void reset();
+  boolean check(void);
+  boolean begin(void);
+  void reset(void);
 
-  uint16_t readUV();
-  uint16_t readIR();
-  uint16_t readVisible();
-  uint16_t readProx();
+  bool readUV(void);
+  bool readIR(void);
+  bool readVisible(void);
+  bool readProx(void);
+
+  uint16_t UV(void) const { return uv; }
+  uint16_t IR(void) const { return ir; }
+  uint16_t visible(void) const { return vis; }
+  uint16_t proximity(void) const { return prox; }
 
  private:
+  uint16_t uv, ir, vis, prox;
+  bool error;
+
   uint16_t read16(uint8_t addr);
   uint8_t read8(uint8_t addr);
   void write8(uint8_t reg, uint8_t val);

@@ -20,15 +20,19 @@
 Adafruit_SI1145::Adafruit_SI1145() {
 }
 
+boolean Adafruit_SI1145::check(void) {
+  uint8_t id = read8(SI1145_REG_PARTID);
+  if (error) return false;
+  return id == 0x45; // look for SI1145
+}
 
 boolean Adafruit_SI1145::begin(void) {
-  uint8_t id = read8(SI1145_REG_PARTID);
-  if (id != 0x45) return false; // look for SI1145
-  
-  reset();
-  
+  if (!check())
+    return false;
 
-    /***********************************/
+  reset();
+
+  /***********************************/
   // enable UVindex measurement coefficients!
   write8(SI1145_REG_UCOEFF0, 0x29);
   write8(SI1145_REG_UCOEFF1, 0x89);
@@ -36,14 +40,16 @@ boolean Adafruit_SI1145::begin(void) {
   write8(SI1145_REG_UCOEFF3, 0x00);
 
   // enable UV sensor
-  writeParam(SI1145_PARAM_CHLIST, SI1145_PARAM_CHLIST_ENUV |
-  SI1145_PARAM_CHLIST_ENALSIR | SI1145_PARAM_CHLIST_ENALSVIS |
-  SI1145_PARAM_CHLIST_ENPS1);
+  writeParam(SI1145_PARAM_CHLIST,
+	     SI1145_PARAM_CHLIST_ENUV |
+	     SI1145_PARAM_CHLIST_ENALSIR |
+	     SI1145_PARAM_CHLIST_ENALSVIS |
+	     SI1145_PARAM_CHLIST_ENPS1);
   // enable interrupt on every sample
   write8(SI1145_REG_INTCFG, SI1145_REG_INTCFG_INTOE);  
   write8(SI1145_REG_IRQEN, SI1145_REG_IRQEN_ALSEVERYSAMPLE);  
 
-/****************************** Prox Sense 1 */
+  /****************************** Prox Sense 1 */
 
   // program LED current
   write8(SI1145_REG_PSLED21, 0x03); // 20mA for LED 1 only
@@ -55,8 +61,9 @@ boolean Adafruit_SI1145::begin(void) {
   // take 511 clocks to measure
   writeParam(SI1145_PARAM_PSADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK);
   // in prox mode, high range
-  writeParam(SI1145_PARAM_PSADCMISC, SI1145_PARAM_PSADCMISC_RANGE|
-    SI1145_PARAM_PSADCMISC_PSMODE);
+  writeParam(SI1145_PARAM_PSADCMISC,
+	     SI1145_PARAM_PSADCMISC_RANGE |
+	     SI1145_PARAM_PSADCMISC_PSMODE);
 
   writeParam(SI1145_PARAM_ALSIRADCMUX, SI1145_PARAM_ADCMUX_SMALLIR);  
   // fastest clocks, clock div 1
@@ -76,7 +83,7 @@ boolean Adafruit_SI1145::begin(void) {
   writeParam(SI1145_PARAM_ALSVISADCMISC, SI1145_PARAM_ALSVISADCMISC_VISRANGE);
 
 
-/************************/
+  /************************/
 
   // measurement rate for auto
   write8(SI1145_REG_MEASRATE0, 0xFF); // 255 * 31.25uS = 8ms
@@ -106,24 +113,24 @@ void Adafruit_SI1145::reset() {
 
 //////////////////////////////////////////////////////
 
-// returns the UV index * 100 (divide by 100 to get the index)
-uint16_t Adafruit_SI1145::readUV(void) {
- return read16(0x2C); 
+bool Adafruit_SI1145::readUV(void) {
+  uv = read16(0x2C);
+  return ~error;
 }
 
-// returns visible+IR light levels
-uint16_t Adafruit_SI1145::readVisible(void) {
- return read16(0x22); 
+bool Adafruit_SI1145::readVisible(void) {
+  vis = read16(0x22);
+  return ~error;
 }
 
-// returns IR light levels
-uint16_t Adafruit_SI1145::readIR(void) {
- return read16(0x24); 
+bool Adafruit_SI1145::readIR(void) {
+  ir = read16(0x24);
+  return ~error;
 }
 
-// returns "Proximity" - assumes an IR LED is attached to LED
-uint16_t Adafruit_SI1145::readProx(void) {
- return read16(0x26); 
+bool Adafruit_SI1145::readProx(void) {
+  prox = read16(0x26);
+  return ~error;
 }
 
 /*********************************************************************/
@@ -145,25 +152,41 @@ uint8_t Adafruit_SI1145::readParam(uint8_t p) {
 /*********************************************************************/
 
 uint8_t  Adafruit_SI1145::read8(uint8_t reg) {
-  uint16_t val;
-    Wire.beginTransmission(SI1145_ADDR);
-    Wire.write((uint8_t)reg);
-    Wire.endTransmission();
+  Wire.beginTransmission(SI1145_ADDR);
+  Wire.write((uint8_t)reg);
+  Wire.endTransmission();
 
-    Wire.requestFrom(SI1145_ADDR, (size_t)1);
-    return Wire.read();
+  Wire.requestFrom(SI1145_ADDR, (size_t)1);
+  int ret = Wire.read();
+  error = false;
+  if (ret == -1) {
+    error = true;
+    return 0;
+  }
+  return ret;
 }
 
 uint16_t Adafruit_SI1145::read16(uint8_t a) {
-  uint16_t ret;
-
   Wire.beginTransmission(SI1145_ADDR); // start transmission to device
   Wire.write(a); // sends register address to read from
   Wire.endTransmission(); // end transmission
   
   Wire.requestFrom(SI1145_ADDR, (size_t)2);// send data n-bytes read
-  ret = Wire.read(); // receive DATA
-  ret |= (uint16_t)Wire.read() << 8; // receive DATA
+  int d;
+  error = false;
+  d = Wire.read();
+  if (d == -1) {
+    error = true;
+    return 0;
+  }
+  uint16_t ret = d;
+
+  d = Wire.read();
+  if (d == -1) {
+    error = true;
+    return 0;
+  }
+  ret |= (uint16_t)d << 8;
 
   return ret;
 }
