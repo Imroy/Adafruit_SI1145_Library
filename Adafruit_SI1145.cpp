@@ -18,7 +18,6 @@
 #include "Adafruit_SI1145.h"
 
 Adafruit_SI1145::Adafruit_SI1145() {
-  _addr = SI1145_ADDR;
 }
 
 
@@ -147,22 +146,22 @@ uint8_t Adafruit_SI1145::readParam(uint8_t p) {
 
 uint8_t  Adafruit_SI1145::read8(uint8_t reg) {
   uint16_t val;
-    Wire.beginTransmission(_addr);
+    Wire.beginTransmission(SI1145_ADDR);
     Wire.write((uint8_t)reg);
     Wire.endTransmission();
 
-    Wire.requestFrom((uint8_t)_addr, (uint8_t)1);  
+    Wire.requestFrom(SI1145_ADDR, (size_t)1);
     return Wire.read();
 }
 
 uint16_t Adafruit_SI1145::read16(uint8_t a) {
   uint16_t ret;
 
-  Wire.beginTransmission(_addr); // start transmission to device 
+  Wire.beginTransmission(SI1145_ADDR); // start transmission to device
   Wire.write(a); // sends register address to read from
   Wire.endTransmission(); // end transmission
   
-  Wire.requestFrom(_addr, (uint8_t)2);// send data n-bytes read
+  Wire.requestFrom(SI1145_ADDR, (size_t)2);// send data n-bytes read
   ret = Wire.read(); // receive DATA
   ret |= (uint16_t)Wire.read() << 8; // receive DATA
 
@@ -170,8 +169,7 @@ uint16_t Adafruit_SI1145::read16(uint8_t a) {
 }
 
 void Adafruit_SI1145::write8(uint8_t reg, uint8_t val) {
-
-  Wire.beginTransmission(_addr); // start transmission to device 
+  Wire.beginTransmission(SI1145_ADDR); // start transmission to device
   Wire.write(reg); // sends register address to write
   Wire.write(val); // sends value
   Wire.endTransmission(); // end transmission

@@ -144,7 +144,7 @@
 #define SI1145_REG_PARAMRD 0x2E
 #define SI1145_REG_CHIPSTAT 0x30
 
-#define SI1145_ADDR 0x60
+#define SI1145_ADDR (uint8_t)0x60
 
 class Adafruit_SI1145  {
  public:
@@ -163,7 +163,5 @@ class Adafruit_SI1145  {
   void write8(uint8_t reg, uint8_t val);
   uint8_t readParam(uint8_t p);
   uint8_t writeParam(uint8_t p, uint8_t v);
-
-  uint8_t _addr;
 };
 
