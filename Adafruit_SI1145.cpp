@@ -126,6 +126,24 @@ uint8_t Adafruit_SI1145::readParam(uint8_t p) {
   return read8(SI1145_REG_PARAMRD);
 }
 
+bool Adafruit_SI1145::cmd(uint8_t code) {
+  uint8_t res = response();
+  if (res & 0x80) {
+    reset();
+    res = response();
+  }
+  uint8_t count = res & 0xf;
+
+  write8(SI1145_REG_COMMAND, code);
+  do {
+    delay(1);
+    res = response();
+  } while (count == res & 0xf);
+
+  return res & 0x80 ? false : true;
+}
+
+
 /*********************************************************************/
 
 uint8_t  Adafruit_SI1145::read8(uint8_t reg) {
