@@ -90,24 +90,24 @@ void Adafruit_SI1145::reset() {
 
 //////////////////////////////////////////////////////
 
-bool Adafruit_SI1145::readUV(void) {
-  uv = read16(0x2C);
-  return ~error;
-}
-
 bool Adafruit_SI1145::readVisible(void) {
   vis = read16(0x22);
-  return ~error;
+  return !error;
 }
 
 bool Adafruit_SI1145::readIR(void) {
   ir = read16(0x24);
-  return ~error;
+  return !error;
 }
 
 bool Adafruit_SI1145::readProx(void) {
   prox = read16(0x26);
-  return ~error;
+  return !error;
+}
+
+bool Adafruit_SI1145::readUV(void) {
+  uv = read16(0x2C);
+  return !error;
 }
 
 /*********************************************************************/

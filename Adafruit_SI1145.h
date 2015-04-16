@@ -153,16 +153,16 @@ class Adafruit_SI1145  {
   boolean begin(void);
   void reset(void);
 
-  bool readUV(void);
   bool doMeasurement(void) { cmd(SI1145_ALS_FORCE); }
   bool readIR(void);
   bool readVisible(void);
   bool readProx(void);
+  bool readUV(void);
 
-  uint16_t UV(void) const { return uv; }
   uint16_t IR(void) const { return ir; }
   uint16_t visible(void) const { return vis; }
   uint16_t proximity(void) const { return prox; }
+  uint16_t UV(void) const { return uv; }
 
  private:
   uint16_t uv, ir, vis, prox;
