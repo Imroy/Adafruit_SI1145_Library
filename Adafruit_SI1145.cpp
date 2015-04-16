@@ -43,27 +43,9 @@ boolean Adafruit_SI1145::begin(void) {
   writeParam(SI1145_PARAM_CHLIST,
 	     SI1145_PARAM_CHLIST_ENUV |
 	     SI1145_PARAM_CHLIST_ENALSIR |
-	     SI1145_PARAM_CHLIST_ENALSVIS |
-	     SI1145_PARAM_CHLIST_ENPS1);
-  // enable interrupt on every sample
-  write8(SI1145_REG_INTCFG, SI1145_REG_INTCFG_INTOE);  
-  write8(SI1145_REG_IRQEN, SI1145_REG_IRQEN_ALSEVERYSAMPLE);  
+	     SI1145_PARAM_CHLIST_ENALSVIS);
 
-  /****************************** Prox Sense 1 */
-
-  // program LED current
-  write8(SI1145_REG_PSLED21, 0x03); // 20mA for LED 1 only
-  writeParam(SI1145_PARAM_PS1ADCMUX, SI1145_PARAM_ADCMUX_LARGEIR);
-  // prox sensor #1 uses LED #1
-  writeParam(SI1145_PARAM_PSLED12SEL, SI1145_PARAM_PSLED12SEL_PS1LED1);
-  // fastest clocks, clock div 1
-  writeParam(SI1145_PARAM_PSADCGAIN, 0);
-  // take 511 clocks to measure
-  writeParam(SI1145_PARAM_PSADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK);
-  // in prox mode, high range
-  writeParam(SI1145_PARAM_PSADCMISC,
-	     SI1145_PARAM_PSADCMISC_RANGE |
-	     SI1145_PARAM_PSADCMISC_PSMODE);
+  write8(SI1145_REG_INTCFG, 0);
 
   writeParam(SI1145_PARAM_ALSIRADCMUX, SI1145_PARAM_ADCMUX_SMALLIR);  
   // fastest clocks, clock div 1
@@ -83,13 +65,8 @@ boolean Adafruit_SI1145::begin(void) {
   writeParam(SI1145_PARAM_ALSVISADCMISC, SI1145_PARAM_ALSVISADCMISC_VISRANGE);
 
 
-  /************************/
 
-  // measurement rate for auto
-  write8(SI1145_REG_MEASRATE0, 0xFF); // 255 * 31.25uS = 8ms
   
-  // auto run
-  write8(SI1145_REG_COMMAND, SI1145_PSALS_AUTO);
 
   return true;
 }
