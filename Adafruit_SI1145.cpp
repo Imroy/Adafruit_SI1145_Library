@@ -129,15 +129,22 @@ bool Adafruit_SI1145::cmd(uint8_t code) {
     reset();
     res = response();
   }
-  uint8_t count = res & 0xf;
-
+  last_count = res & 0xf;
   write8(SI1145_REG_COMMAND, code);
+
+  return response() & 0x80 ? false : true;
+}
+
+bool Adafruit_SI1145::wait(void) {
+  uint8_t res;
   do {
     delay(1);
     res = response();
-  } while (count == res & 0xf);
+    if (res & 0x80)
+      return false;
+  } while (((res & 0x80) == 0) && (last_count == (res & 0xf)));
 
-  return res & 0x80 ? false : true;
+  return true;
 }
 
 

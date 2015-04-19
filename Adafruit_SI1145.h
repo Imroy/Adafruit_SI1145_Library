@@ -153,7 +153,9 @@ class Adafruit_SI1145  {
   boolean begin(void);
   void reset(void);
 
-  bool doMeasurement(void) { cmd(SI1145_ALS_FORCE); }
+  // max 3.28 ms?
+  bool doMeasurement(void) { return cmd(SI1145_ALS_FORCE); }
+  bool wait(void);
   bool readIR(void);
   bool readVisible(void);
   bool readProx(void);
@@ -167,6 +169,7 @@ class Adafruit_SI1145  {
  private:
   uint16_t uv, ir, vis, prox;
   bool error;
+  uint8_t last_count;
 
   uint8_t response(void) { return read8(0x20); }
   bool cmd(uint8_t code);
