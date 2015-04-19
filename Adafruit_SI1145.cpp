@@ -113,9 +113,6 @@ bool Adafruit_SI1145::readUV(void) {
 /*********************************************************************/
 
 uint8_t Adafruit_SI1145::writeParam(uint8_t p, uint8_t v) {
-  //Serial.print("Param 0x"); Serial.print(p, HEX);
-  //Serial.print(" = 0x"); Serial.println(v, HEX);
-  
   write8(SI1145_REG_PARAMWR, v);
   write8(SI1145_REG_COMMAND, p | SI1145_PARAM_SET);
   return read8(SI1145_REG_PARAMRD);
