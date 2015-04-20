@@ -154,7 +154,9 @@ class Adafruit_SI1145  {
   void reset(void);
 
   // max 3.28 ms?
-  bool doMeasurement(void) { return cmd(SI1145_ALS_FORCE); }
+  unsigned long doMeasurement(void) {
+    return cmd(SI1145_ALS_FORCE) ? 4 : 0;
+  }
   bool wait(void);
   bool readIR(void);
   bool readVisible(void);
