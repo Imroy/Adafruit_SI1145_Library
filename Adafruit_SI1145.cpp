@@ -100,11 +100,6 @@ bool Adafruit_SI1145::readIR(void) {
   return !error;
 }
 
-bool Adafruit_SI1145::readProx(void) {
-  prox = read16(0x26);
-  return !error;
-}
-
 bool Adafruit_SI1145::readUV(void) {
   uv = read16(0x2C);
   return !error;
