@@ -45,7 +45,9 @@ boolean Adafruit_SI1145::begin(void) {
 	     SI1145_PARAM_CHLIST_ENALSIR |
 	     SI1145_PARAM_CHLIST_ENALSVIS);
 
+  // no interrupts
   write8(SI1145_REG_INTCFG, 0);
+  write8(SI1145_REG_IRQEN, 0);
 
   writeParam(SI1145_PARAM_ALSIRADCMUX, SI1145_PARAM_ADCMUX_SMALLIR);  
   // fastest clocks, clock div 1
@@ -55,8 +57,6 @@ boolean Adafruit_SI1145::begin(void) {
   // in high range mode
   writeParam(SI1145_PARAM_ALSIRADCMISC, SI1145_PARAM_ALSIRADCMISC_RANGE);
 
-
-
   // fastest clocks, clock div 1
   writeParam(SI1145_PARAM_ALSVISADCGAIN, 0);
   // take 511 clocks to measure
@@ -64,9 +64,9 @@ boolean Adafruit_SI1145::begin(void) {
   // in high range mode (not normal signal)
   writeParam(SI1145_PARAM_ALSVISADCMISC, SI1145_PARAM_ALSVISADCMISC_VISRANGE);
 
-
-
-  
+  // forced measurement mode
+  write8(SI1145_REG_MEASRATE0, 0x00);
+  write8(SI1145_REG_MEASRATE1, 0x00);
 
   return true;
 }
