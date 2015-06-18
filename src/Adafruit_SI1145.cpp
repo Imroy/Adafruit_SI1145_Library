@@ -21,7 +21,7 @@ Adafruit_SI1145::Adafruit_SI1145() {
 }
 
 boolean Adafruit_SI1145::check(void) {
-  uint8_t id = read8(SI1145_REG_PARTID);
+  uint8_t id = read8(PARTID);
   if (error) return false;
   return id == 0x45; // look for SI1145
 }
@@ -34,55 +34,55 @@ boolean Adafruit_SI1145::begin(void) {
 
   /***********************************/
   // enable UVindex measurement coefficients!
-  write8(SI1145_REG_UCOEFF0, 0x29);	// vis = 0.033486
-  write8(SI1145_REG_UCOEFF1, 0x89);
-  write8(SI1145_REG_UCOEFF2, 0x02);	// ir = 0.000002
-  write8(SI1145_REG_UCOEFF3, 0x00);
+  write8(UCOEFF0, 0x29);	// vis = 0.033486
+  write8(UCOEFF1, 0x89);
+  write8(UCOEFF2, 0x02);	// ir = 0.000002
+  write8(UCOEFF3, 0x00);
 
   // enable UV sensor
-  writeParam(SI1145_PARAM_CHLIST,
-	     SI1145_PARAM_CHLIST_ENUV |
-	     SI1145_PARAM_CHLIST_ENALSIR |
-	     SI1145_PARAM_CHLIST_ENALSVIS);
+  writeParam(CHLIST,
+	     CHLIST_ENUV |
+	     CHLIST_ENALSIR |
+	     CHLIST_ENALSVIS);
 
   // no interrupts
-  write8(SI1145_REG_INTCFG, 0);
-  write8(SI1145_REG_IRQEN, 0);
+  write8(INTCFG, 0);
+  write8(IRQEN, 0);
 
-  writeParam(SI1145_PARAM_ALSIRADCMUX, SI1145_PARAM_ADCMUX_SMALLIR);
+  writeParam(ALSIRADCMUX, ADCMUX_SMALLIR);
   // fastest clocks, clock div 1
-  writeParam(SI1145_PARAM_ALSIRADCGAIN, 0);
+  writeParam(ALSIRADCGAIN, 0);
   // take 511 clocks to measure
-  writeParam(SI1145_PARAM_ALSIRADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK);
+  writeParam(ALSIRADCOUNTER, ADCCOUNTER_511CLK);
   // in high range mode
-  writeParam(SI1145_PARAM_ALSIRADCMISC, SI1145_PARAM_ALSIRADCMISC_RANGE);
+  writeParam(ALSIRADCMISC, ALSIRADCMISC_RANGE);
 
   // fastest clocks, clock div 1
-  writeParam(SI1145_PARAM_ALSVISADCGAIN, 0);
+  writeParam(ALSVISADCGAIN, 0);
   // take 511 clocks to measure
-  writeParam(SI1145_PARAM_ALSVISADCOUNTER, SI1145_PARAM_ADCCOUNTER_511CLK);
+  writeParam(ALSVISADCOUNTER, ADCCOUNTER_511CLK);
   // in high range mode (not normal signal)
-  writeParam(SI1145_PARAM_ALSVISADCMISC, SI1145_PARAM_ALSVISADCMISC_VISRANGE);
+  writeParam(ALSVISADCMISC, ALSVISADCMISC_VISRANGE);
 
   // forced measurement mode
-  write8(SI1145_REG_MEASRATE0, 0x00);
-  write8(SI1145_REG_MEASRATE1, 0x00);
+  write8(MEASRATE0, 0x00);
+  write8(MEASRATE1, 0x00);
 
   return true;
 }
 
 void Adafruit_SI1145::reset() {
-  write8(SI1145_REG_MEASRATE0, 0);
-  write8(SI1145_REG_MEASRATE1, 0);
-  write8(SI1145_REG_IRQEN, 0);
-  write8(SI1145_REG_IRQMODE1, 0);
-  write8(SI1145_REG_IRQMODE2, 0);
-  write8(SI1145_REG_INTCFG, 0);
-  write8(SI1145_REG_IRQSTAT, 0xFF);
+  write8(MEASRATE0, 0);
+  write8(MEASRATE1, 0);
+  write8(IRQEN, 0);
+  write8(IRQMODE1, 0);
+  write8(IRQMODE2, 0);
+  write8(INTCFG, 0);
+  write8(IRQSTAT, 0xFF);
 
-  write8(SI1145_REG_COMMAND, SI1145_RESET);
+  write8(COMMAND, RESET);
   delay(10);
-  write8(SI1145_REG_HWKEY, 0x17);
+  write8(HWKEY, 0x17);
 
   delay(10);
 }
@@ -91,41 +91,41 @@ void Adafruit_SI1145::reset() {
 //////////////////////////////////////////////////////
 
 bool Adafruit_SI1145::readVisible(void) {
-  vis = read16(0x22);
+  vis = read16(ALSVISDATA0);
   return !error;
 }
 
 bool Adafruit_SI1145::readIR(void) {
-  ir = read16(0x24);
+  ir = read16(ALSIRDATA0);
   return !error;
 }
 
 bool Adafruit_SI1145::readUV(void) {
-  uv = read16(0x2C);
+  uv = read16(UVINDEX0);
   return !error;
 }
 
 /*********************************************************************/
 
-uint8_t Adafruit_SI1145::writeParam(uint8_t p, uint8_t v) {
-  write8(SI1145_REG_PARAMWR, v);
-  write8(SI1145_REG_COMMAND, p | SI1145_PARAM_SET);
-  return read8(SI1145_REG_PARAMRD);
+uint8_t Adafruit_SI1145::writeParam(SI1145_parameter p, uint8_t v) {
+  write8(PARAMWR, v);
+  write8(COMMAND, p | PARAM_SET);
+  return read8(PARAMRD);
 }
 
-uint8_t Adafruit_SI1145::readParam(uint8_t p) {
-  write8(SI1145_REG_COMMAND, p | SI1145_PARAM_QUERY);
-  return read8(SI1145_REG_PARAMRD);
+uint8_t Adafruit_SI1145::readParam(SI1145_parameter p) {
+  write8(COMMAND, p | PARAM_QUERY);
+  return read8(PARAMRD);
 }
 
-bool Adafruit_SI1145::cmd(uint8_t code) {
+bool Adafruit_SI1145::cmd(SI1145_command code) {
   uint8_t res = response();
   if (res & 0x80) {
     reset();
     res = response();
   }
   last_count = res & 0xf;
-  write8(SI1145_REG_COMMAND, code);
+  write8(COMMAND, code);
 
   return response() & 0x80 ? false : true;
 }
@@ -145,7 +145,7 @@ bool Adafruit_SI1145::wait(void) {
 
 /*********************************************************************/
 
-uint8_t  Adafruit_SI1145::read8(uint8_t reg) {
+uint8_t  Adafruit_SI1145::read8(SI1145_register reg) {
   Wire.beginTransmission(SI1145_ADDR);
   Wire.write((uint8_t)reg);
   Wire.endTransmission();
@@ -160,9 +160,9 @@ uint8_t  Adafruit_SI1145::read8(uint8_t reg) {
   return ret;
 }
 
-uint16_t Adafruit_SI1145::read16(uint8_t a) {
+uint16_t Adafruit_SI1145::read16(SI1145_register reg) {
   Wire.beginTransmission(SI1145_ADDR); // start transmission to device
-  Wire.write(a); // sends register address to read from
+  Wire.write(reg); // sends register address to read from
   Wire.endTransmission(); // end transmission
 
   Wire.requestFrom(SI1145_ADDR, (size_t)2);// send data n-bytes read
@@ -185,7 +185,7 @@ uint16_t Adafruit_SI1145::read16(uint8_t a) {
   return ret;
 }
 
-void Adafruit_SI1145::write8(uint8_t reg, uint8_t val) {
+void Adafruit_SI1145::write8(SI1145_register reg, uint8_t val) {
   Wire.beginTransmission(SI1145_ADDR); // start transmission to device
   Wire.write(reg); // sends register address to write
   Wire.write(val); // sends value
