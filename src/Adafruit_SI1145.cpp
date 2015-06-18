@@ -1,17 +1,17 @@
-/*************************************************** 
+/***************************************************
   This is a library for the Si1145 UV/IR/Visible Light Sensor
 
   Designed specifically to work with the Si1145 sensor in the
   adafruit shop
   ----> https://www.adafruit.com/products/1777
 
-  These sensors use I2C to communicate, 2 pins are required to  
+  These sensors use I2C to communicate, 2 pins are required to
   interface
-  Adafruit invests time and resources providing this open source code, 
-  please support Adafruit and open-source hardware by purchasing 
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
   products from Adafruit!
 
-  Written by Limor Fried/Ladyada for Adafruit Industries.  
+  Written by Limor Fried/Ladyada for Adafruit Industries.
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
@@ -34,9 +34,9 @@ boolean Adafruit_SI1145::begin(void) {
 
   /***********************************/
   // enable UVindex measurement coefficients!
-  write8(SI1145_REG_UCOEFF0, 0x29);
+  write8(SI1145_REG_UCOEFF0, 0x29);	// vis = 0.033486
   write8(SI1145_REG_UCOEFF1, 0x89);
-  write8(SI1145_REG_UCOEFF2, 0x02);
+  write8(SI1145_REG_UCOEFF2, 0x02);	// ir = 0.000002
   write8(SI1145_REG_UCOEFF3, 0x00);
 
   // enable UV sensor
@@ -49,7 +49,7 @@ boolean Adafruit_SI1145::begin(void) {
   write8(SI1145_REG_INTCFG, 0);
   write8(SI1145_REG_IRQEN, 0);
 
-  writeParam(SI1145_PARAM_ALSIRADCMUX, SI1145_PARAM_ADCMUX_SMALLIR);  
+  writeParam(SI1145_PARAM_ALSIRADCMUX, SI1145_PARAM_ADCMUX_SMALLIR);
   // fastest clocks, clock div 1
   writeParam(SI1145_PARAM_ALSIRADCGAIN, 0);
   // take 511 clocks to measure
@@ -83,7 +83,7 @@ void Adafruit_SI1145::reset() {
   write8(SI1145_REG_COMMAND, SI1145_RESET);
   delay(10);
   write8(SI1145_REG_HWKEY, 0x17);
-  
+
   delay(10);
 }
 
@@ -164,7 +164,7 @@ uint16_t Adafruit_SI1145::read16(uint8_t a) {
   Wire.beginTransmission(SI1145_ADDR); // start transmission to device
   Wire.write(a); // sends register address to read from
   Wire.endTransmission(); // end transmission
-  
+
   Wire.requestFrom(SI1145_ADDR, (size_t)2);// send data n-bytes read
   int d;
   error = false;
